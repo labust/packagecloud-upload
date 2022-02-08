@@ -1,0 +1,33 @@
+name: "Upload archives to packagecloud."
+description: "Upload archives/files from context directory to packagecloud repository."
+inputs:
+   token:
+     required: true
+     description: "The token to allow packagecloud upload."
+   repository:
+     required: true
+     description: "The name of the packagecloud repository."
+   distribution:
+     required: true
+     description: "The distribution or subfolder name where to upload in the give repository."
+   username: 
+     required: true
+     description: "The username to use for the packagecloud repository."
+   context:
+     required: false
+     description: "The folder where the archives are located."
+     default: '.'
+     
+runs:
+ using: "composite"
+ steps:
+   - name: Install packagecloud
+     run: |
+          apt update
+          apt install -y ruby-dev
+          gem install package_cloud
+     shell: bash
+     
+   - name: Push to packagecloud
+     run: PACKAGECLOUD_TOKEN=${{ inputs.TOKEN }} package_cloud push labust/deb/ubuntu/focal ${{ inputs.context }}/*
+     shell: bash
